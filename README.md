@@ -1,2 +1,2 @@
-# dealjoy_smart_contract
-Dealjoy Smart Contract
+# Dealjoy Smart Contract
+This repository will be used to hold Dealjoy's ICO smart contracts
