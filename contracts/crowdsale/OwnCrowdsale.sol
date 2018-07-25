@@ -1,6 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "../math/SafeMath.sol";
 import "./validation/WhitelistedCrowdsale.sol";
 import "./validation/TimedCrowdsale.sol";
 import "./validation/CappedCrowdsale.sol";
@@ -9,7 +8,8 @@ import "./Crowdsale.sol";
 
 contract OwnCrowdsale is WhitelistedCrowdsale, TimedCrowdsale, CappedCrowdsale, Pausable {
 
-	uint256 minInvestment;
+	// Minimum investment for this sale period, in weis
+	uint256 public minInvestment;
 
   constructor(
 	address _wallet, 
