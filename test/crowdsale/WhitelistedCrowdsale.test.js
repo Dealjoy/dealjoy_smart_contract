@@ -7,18 +7,13 @@ require('chai')
   .should();
 
 const WhitelistedCrowdsale = artifacts.require('WhitelistedCrowdsaleImpl');
-const SimpleToken = artifacts.require('SimpleToken');
 
 contract('WhitelistedCrowdsale', function ([_, wallet, authorized, unauthorized, anotherAuthorized]) {
-  const rate = 1;
-  const value = ether(42);
-  const tokenSupply = new BigNumber('1e22');
+  const value = ether(2);
 
   describe('single user whitelisting', function () {
     beforeEach(async function () {
-      this.token = await SimpleToken.new();
-      this.crowdsale = await WhitelistedCrowdsale.new(rate, wallet, this.token.address);
-      await this.token.transfer(this.crowdsale.address, tokenSupply);
+      this.crowdsale = await WhitelistedCrowdsale.new(wallet);
       await this.crowdsale.addAddressToWhitelist(authorized);
     });
 
@@ -53,9 +48,7 @@ contract('WhitelistedCrowdsale', function ([_, wallet, authorized, unauthorized,
 
   describe('many user whitelisting', function () {
     beforeEach(async function () {
-      this.token = await SimpleToken.new();
-      this.crowdsale = await WhitelistedCrowdsale.new(rate, wallet, this.token.address);
-      await this.token.transfer(this.crowdsale.address, tokenSupply);
+      this.crowdsale = await WhitelistedCrowdsale.new(wallet);
       await this.crowdsale.addAddressesToWhitelist([authorized, anotherAuthorized]);
     });
 

@@ -23,6 +23,8 @@ contract Crowdsale {
 
   // Amount of wei raised
   uint256 public weiRaised;
+  
+  event EthReceived(address indexed purchaser, address indexed beneficiary, uint256 value);
 
   /**
    * @param _wallet Address where collected funds will be forwarded to
@@ -55,7 +57,11 @@ contract Crowdsale {
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
-
+	emit EthReceived(
+      msg.sender,
+      _beneficiary,
+      weiAmount
+    );
     _updatePurchasingState(_beneficiary, weiAmount);
 
     _forwardFunds();

@@ -12,12 +12,9 @@ require('chai')
   .should();
 
 const TimedCrowdsale = artifacts.require('TimedCrowdsaleImpl');
-const SimpleToken = artifacts.require('SimpleToken');
 
 contract('TimedCrowdsale', function ([_, investor, wallet, purchaser]) {
-  const rate = new BigNumber(1);
-  const value = ether(42);
-  const tokenSupply = new BigNumber('1e22');
+  const value = ether(2);
 
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
@@ -28,9 +25,7 @@ contract('TimedCrowdsale', function ([_, investor, wallet, purchaser]) {
     this.openingTime = (await latestTime()) + duration.weeks(1);
     this.closingTime = this.openingTime + duration.weeks(1);
     this.afterClosingTime = this.closingTime + duration.seconds(1);
-    this.token = await SimpleToken.new();
-    this.crowdsale = await TimedCrowdsale.new(this.openingTime, this.closingTime, rate, wallet, this.token.address);
-    await this.token.transfer(this.crowdsale.address, tokenSupply);
+    this.crowdsale = await TimedCrowdsale.new(this.openingTime, this.closingTime, wallet);
   });
 
   it('should be ended only after end', async function () {
