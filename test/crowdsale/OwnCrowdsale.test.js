@@ -48,6 +48,13 @@ contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, purchaser
 	  await this.crowdsale.pause();
       await this.crowdsale.sendTransaction({ value: value }).should.be.rejectedWith(EVMRevert);
     });
+    it('should be unpausable only by the owner', async function () {
+	  await this.crowdsale.pause();
+	  await this.crowdsale.unpause({ from: investor }).should.be.rejectedWith(EVMRevert);
+      await this.crowdsale.sendTransaction({ value: value }).should.be.rejectedWith(EVMRevert);
+	  await this.crowdsale.unpause({ from: origWallet }).should.be.fulfilled;
+      await this.crowdsale.sendTransaction({ value: value }).should.be.fulfilled;
+    });
   });
 
   
@@ -83,6 +90,45 @@ contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, purchaser
 	  
       await this.crowdsale.sendTransaction({ value: oldMinInv, from: investor }).should.be.rejectedWith(EVMRevert);
 	  await this.crowdsale.sendTransaction({ value: moreThanMin, from: investor }).should.be.fulfilled;
+	  
+	  
+    });
+  });
+
+  describe('with all settings', function () {
+    it('purchasing should fail until all conditions met', async function () {
+
+	  const oldMinInv = await this.crowdsale.minInvestment();
+	  const moreThanMin = oldMinInv.add(2);
+	  const moreThanNewMin = moreThanMin.add(3);
+
+	  const openingTime = (await latestTime()) + duration.weeks(1);
+      const closingTime = this.openingTime + duration.weeks(20);
+      const afterClosingTime = this.closingTime + duration.seconds(1);
+	  
+	  // recreate crowdsale to reset minimum investment
+	  this.openingTime = (await latestTime()) + duration.weeks(1);
+	  this.crowdsale = await Crowdsale.new(wallet, moreThanMin, openingTime, closingTime, cap);
+
+	  // not added to whitelist and the crowdsale hasn't started
+	  await this.crowdsale.sendTransaction({ value: moreThanNewMin, from: investor }).should.be.rejectedWith(EVMRevert);
+		
+	  await this.crowdsale.addAddressesToWhitelist([ origWallet, investor, wallet, purchaser ]);
+	  
+	  // The crowdsale hasn't started
+	  await this.crowdsale.sendTransaction({ value: moreThanNewMin, from: investor }).should.be.rejectedWith(EVMRevert);
+	
+	  // start from the beginning of sales phases
+	  await increaseTimeTo(openingTime);
+
+	  
+	  // end of recreation
+	  
+	  const newMinInv = await this.crowdsale.minInvestment();
+	  newMinInv.should.be.bignumber.equal(moreThanMin);
+	  
+      await this.crowdsale.sendTransaction({ value: moreThanMin, from: investor }).should.be.fulfilled;
+	  await this.crowdsale.sendTransaction({ value: moreThanNewMin, from: investor }).should.be.fulfilled;
 	  
 	  
     });
