@@ -13,7 +13,7 @@ const should = require('chai')
 
 const Crowdsale = artifacts.require('OwnCrowdsale');
 
-contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, purchaser]) {
+contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, notWhitelisted]) {
 
   const value = new BigNumber(ether(2));
   const cap = new BigNumber(ether(15));
@@ -36,7 +36,7 @@ contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, purchaser
     this.afterClosingTime = this.closingTime + duration.seconds(1);
     this.crowdsale = await Crowdsale.new(wallet, minInvestment, this.openingTime, this.closingTime, cap);
 
-	await this.crowdsale.addAddressesToWhitelist([ origWallet, investor, wallet, purchaser ]);
+	await this.crowdsale.addAddressesToWhitelist([ origWallet, investor, wallet]);
 	
 	// start from the beginning of sales phases
 	await increaseTimeTo(this.openingTime);
@@ -76,62 +76,68 @@ contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, purchaser
 	  
 	  // recreate crowdsale to reset minimum investment
 	  this.openingTime = (await latestTime()) + duration.weeks(1);
-	  this.crowdsale = await Crowdsale.new(wallet, moreThanMin, this.openingTime, this.closingTime, cap);
+	  const crowdsale = await Crowdsale.new(wallet, moreThanMin, this.openingTime, this.closingTime, cap);
 		
-	  await this.crowdsale.addAddressesToWhitelist([ origWallet, investor, wallet, purchaser ]);
+	  await crowdsale.addAddressesToWhitelist([ origWallet, investor, wallet ]);
 	
 	  // start from the beginning of sales phases
 	  await increaseTimeTo(this.openingTime);
 	  
 	  // end of recreation
 	  
-	  const newMinInv = await this.crowdsale.minInvestment();
+	  const newMinInv = await crowdsale.minInvestment();
 	  newMinInv.should.be.bignumber.equal(moreThanMin);
 	  
-      await this.crowdsale.sendTransaction({ value: oldMinInv, from: investor }).should.be.rejectedWith(EVMRevert);
-	  await this.crowdsale.sendTransaction({ value: moreThanMin, from: investor }).should.be.fulfilled;
-	  
+      await crowdsale.sendTransaction({ value: oldMinInv, from: investor }).should.be.rejectedWith(EVMRevert);
+	  await crowdsale.sendTransaction({ value: moreThanMin, from: investor }).should.be.fulfilled;
 	  
     });
   });
 
   describe('with all settings', function () {
-    it('purchasing should fail until all conditions met', async function () {
+	it('investment should fail until whitelisted', async function () {
 
-	  const oldMinInv = await this.crowdsale.minInvestment();
-	  const moreThanMin = oldMinInv.add(2);
-	  const moreThanNewMin = moreThanMin.add(3);
+	  // not added to whitelist
+	  await this.crowdsale.sendTransaction({ value: minInvestment, from: notWhitelisted }).should.be.rejectedWith(EVMRevert);
+		
+	  await this.crowdsale.addAddressesToWhitelist([ notWhitelisted ]);
+	  
+	  // The crowdsale hasn't started
+	  await this.crowdsale.sendTransaction({ value: minInvestment, from: notWhitelisted }).should.be.fulfilled;
+    });
+
+    it('investment should fail until reached minimum investment', async function () {
+	  const minInv = await this.crowdsale.minInvestment();
+	  const lessThanMin = minInv.minus(5);
+	  // less than minimum investment
+	  await this.crowdsale.sendTransaction({ value: lessThanMin, from: investor }).should.be.rejectedWith(EVMRevert);
+	  
+	  // Minimum
+	  await this.crowdsale.sendTransaction({ value: minInv, from: investor }).should.be.fulfilled;
+    });
+
+    it('investment should fail until period started', async function () {
 
 	  const openingTime = (await latestTime()) + duration.weeks(1);
       const closingTime = this.openingTime + duration.weeks(20);
       const afterClosingTime = this.closingTime + duration.seconds(1);
 	  
-	  // recreate crowdsale to reset minimum investment
-	  this.openingTime = (await latestTime()) + duration.weeks(1);
-	  this.crowdsale = await Crowdsale.new(wallet, moreThanMin, openingTime, closingTime, cap);
+	  // recreate crowdsale to reset opening time
+	  const crowdsale = await Crowdsale.new(wallet, minInvestment, openingTime, closingTime, cap);
+	  await crowdsale.addAddressesToWhitelist([ origWallet, investor, wallet ]);
 
-	  // not added to whitelist and the crowdsale hasn't started
-	  await this.crowdsale.sendTransaction({ value: moreThanNewMin, from: investor }).should.be.rejectedWith(EVMRevert);
+	  // crowdsale hasn't started
+	  await crowdsale.sendTransaction({ value: minInvestment, from: investor }).should.be.rejectedWith(EVMRevert);
 		
-	  await this.crowdsale.addAddressesToWhitelist([ origWallet, investor, wallet, purchaser ]);
-	  
-	  // The crowdsale hasn't started
-	  await this.crowdsale.sendTransaction({ value: moreThanNewMin, from: investor }).should.be.rejectedWith(EVMRevert);
-	
 	  // start from the beginning of sales phases
-	  await increaseTimeTo(openingTime);
-
+	  await increaseTimeTo(openingTime);	 
 	  
-	  // end of recreation
+      await crowdsale.sendTransaction({ value: minInvestment, from: investor }).should.be.fulfilled;
 	  
-	  const newMinInv = await this.crowdsale.minInvestment();
-	  newMinInv.should.be.bignumber.equal(moreThanMin);
-	  
-      await this.crowdsale.sendTransaction({ value: moreThanMin, from: investor }).should.be.fulfilled;
-	  await this.crowdsale.sendTransaction({ value: moreThanNewMin, from: investor }).should.be.fulfilled;
-	  
-	  
+	  await increaseTimeTo(afterClosingTime);	
+	  await crowdsale.sendTransaction({ value: minInvestment, from: investor }).should.be.rejectedWith(EVMRevert);
     });
+
   });
   
 });
