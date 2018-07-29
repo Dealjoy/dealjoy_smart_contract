@@ -42,14 +42,14 @@ contract Crowdsale {
    * @dev fallback function ***DO NOT OVERRIDE***
    */
   function () external payable {
-    buyTokens(msg.sender);
+    invest(msg.sender);
   }
 
   /**
    * @dev low level token purchase ***DO NOT OVERRIDE***
    * @param _beneficiary Address performing the token purchase
    */
-  function buyTokens(address _beneficiary) public payable {
+  function invest(address _beneficiary) public payable {
 
     uint256 weiAmount = msg.value;
     _preValidatePurchase(_beneficiary, weiAmount);

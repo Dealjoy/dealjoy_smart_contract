@@ -20,10 +20,6 @@ contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, notWhitel
 
   const minInvestment = ether(1) / 5;
   
-  function getTokenAmount(perRate, origTokens) {
-	  return (origTokens * perRate);
-  }
-  
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
     await advanceBlock();

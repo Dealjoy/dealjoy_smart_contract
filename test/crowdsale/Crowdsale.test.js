@@ -20,7 +20,7 @@ contract('Crowdsale', function ([_, investor, wallet, purchaser]) {
   describe('accepting payments', function () {
     it('should accept payments', async function () {
       await this.crowdsale.send(value).should.be.fulfilled;
-      await this.crowdsale.buyTokens(investor, { value: value, from: purchaser }).should.be.fulfilled;
+      await this.crowdsale.invest(investor, { value: value, from: purchaser }).should.be.fulfilled;
     });
   });
 
@@ -44,7 +44,7 @@ contract('Crowdsale', function ([_, investor, wallet, purchaser]) {
 
   describe('low-level purchase', function () {
     it('should log purchase', async function () {
-      const { logs } = await this.crowdsale.buyTokens(investor, { value: value, from: purchaser });
+      const { logs } = await this.crowdsale.invest(investor, { value: value, from: purchaser });
       const event = logs.find(e => e.event === 'EthReceived');
       should.exist(event);
       event.args.purchaser.should.equal(purchaser);
@@ -54,7 +54,7 @@ contract('Crowdsale', function ([_, investor, wallet, purchaser]) {
 
     it('should forward funds to wallet', async function () {
       const pre = await ethGetBalance(wallet);
-      await this.crowdsale.buyTokens(investor, { value, from: purchaser });
+      await this.crowdsale.invest(investor, { value, from: purchaser });
       const post = await ethGetBalance(wallet);
       post.minus(pre).should.be.bignumber.equal(value);
     });
