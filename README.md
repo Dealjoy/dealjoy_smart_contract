@@ -56,6 +56,11 @@ The following functionality is implemented with these contracts (also noted with
 * The *Pausable* contract is owned by its creator. The creator is the only one with access to pause / unpause the crowdsale
 	* Implemented with contract *Ownable* which is inherited by *Pausable*
 
+### Functionality for tokens
+
+The token is an ERC20 compliant ( https://theethereum.wiki/w/index.php/ERC20_Token_Standard ) token with the default details added (name, ticker, decimals).
+The token contains no functionality and only represents an asset.
+
 ## Implementation notes
 This crowdsale does not handle tokens. This crowdsale is only used to gather Ether investments from whitelisted investors.
 Further backend processing is used to afterwards deliver the actual tokens.
@@ -64,6 +69,31 @@ Most of the smart contracts are taken from OpenZeppelin's GitHub (https://github
 The OpenZeppelin contracts are not modified with the following exceptions:
 - Removed all functionality concerning tokens
 - renamed *buyTokens* function to be *invest*
+
+## Smart contract inheritance architecture
+The smart contracts are layered with inheritance to add functionality in a structured way. Inheritance of different smart contracts is implemented in the following order.
+
+### Token contracts
+* ERC20Basic
+	* ERC20
+		* BasicToken
+			* StandardToken
+				* DetailedERC20
+					* OwnToken
+
+### Crowdsale contracts
+* RBAC, Ownable
+	* Whitelist, Crowdsale
+		* WhitelistedCrowdsale
+* Crowdsale
+	* TimedCrowdsale
+* Crowdsale
+	* CappedCrowdsale
+* Ownable
+	* Pausable
+* Time
+* WhitelistedCrowdsale, TimedCrowdsale, CappedCrowdsale, Pausable
+	* OwnCrowdsale
 
 ## Unit testing
 OpenZeppelin contracts include sufficient unit tests. These unit tests are included as-is with the following exceptions:
