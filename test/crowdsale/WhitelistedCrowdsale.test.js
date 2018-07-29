@@ -20,19 +20,19 @@ contract('WhitelistedCrowdsale', function ([_, wallet, authorized, unauthorized,
     describe('accepting payments', function () {
       it('should accept payments to whitelisted (from whichever buyers)', async function () {
         await this.crowdsale.sendTransaction({ value, from: authorized }).should.be.fulfilled;
-        await this.crowdsale.buyTokens(authorized, { value: value, from: authorized }).should.be.fulfilled;
-        await this.crowdsale.buyTokens(authorized, { value: value, from: unauthorized }).should.be.fulfilled;
+        await this.crowdsale.invest(authorized, { value: value, from: authorized }).should.be.fulfilled;
+        await this.crowdsale.invest(authorized, { value: value, from: unauthorized }).should.be.fulfilled;
       });
 
       it('should reject payments to not whitelisted (from whichever buyers)', async function () {
         await this.crowdsale.sendTransaction({ value, from: unauthorized }).should.be.rejected;
-        await this.crowdsale.buyTokens(unauthorized, { value: value, from: unauthorized }).should.be.rejected;
-        await this.crowdsale.buyTokens(unauthorized, { value: value, from: authorized }).should.be.rejected;
+        await this.crowdsale.invest(unauthorized, { value: value, from: unauthorized }).should.be.rejected;
+        await this.crowdsale.invest(unauthorized, { value: value, from: authorized }).should.be.rejected;
       });
 
       it('should reject payments to addresses removed from whitelist', async function () {
         await this.crowdsale.removeAddressFromWhitelist(authorized);
-        await this.crowdsale.buyTokens(authorized, { value: value, from: authorized }).should.be.rejected;
+        await this.crowdsale.invest(authorized, { value: value, from: authorized }).should.be.rejected;
       });
     });
 
@@ -54,22 +54,22 @@ contract('WhitelistedCrowdsale', function ([_, wallet, authorized, unauthorized,
 
     describe('accepting payments', function () {
       it('should accept payments to whitelisted (from whichever buyers)', async function () {
-        await this.crowdsale.buyTokens(authorized, { value: value, from: authorized }).should.be.fulfilled;
-        await this.crowdsale.buyTokens(authorized, { value: value, from: unauthorized }).should.be.fulfilled;
-        await this.crowdsale.buyTokens(anotherAuthorized, { value: value, from: authorized }).should.be.fulfilled;
-        await this.crowdsale.buyTokens(anotherAuthorized, { value: value, from: unauthorized }).should.be.fulfilled;
+        await this.crowdsale.invest(authorized, { value: value, from: authorized }).should.be.fulfilled;
+        await this.crowdsale.invest(authorized, { value: value, from: unauthorized }).should.be.fulfilled;
+        await this.crowdsale.invest(anotherAuthorized, { value: value, from: authorized }).should.be.fulfilled;
+        await this.crowdsale.invest(anotherAuthorized, { value: value, from: unauthorized }).should.be.fulfilled;
       });
 
       it('should reject payments to not whitelisted (with whichever buyers)', async function () {
         await this.crowdsale.send(value).should.be.rejected;
-        await this.crowdsale.buyTokens(unauthorized, { value: value, from: unauthorized }).should.be.rejected;
-        await this.crowdsale.buyTokens(unauthorized, { value: value, from: authorized }).should.be.rejected;
+        await this.crowdsale.invest(unauthorized, { value: value, from: unauthorized }).should.be.rejected;
+        await this.crowdsale.invest(unauthorized, { value: value, from: authorized }).should.be.rejected;
       });
 
       it('should reject payments to addresses removed from whitelist', async function () {
         await this.crowdsale.removeAddressFromWhitelist(anotherAuthorized);
-        await this.crowdsale.buyTokens(authorized, { value: value, from: authorized }).should.be.fulfilled;
-        await this.crowdsale.buyTokens(anotherAuthorized, { value: value, from: authorized }).should.be.rejected;
+        await this.crowdsale.invest(authorized, { value: value, from: authorized }).should.be.fulfilled;
+        await this.crowdsale.invest(anotherAuthorized, { value: value, from: authorized }).should.be.rejected;
       });
     });
 
