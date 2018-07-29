@@ -10,7 +10,7 @@ const cap = new BigNumber(ether(15));
 
   const minInvestment = ether(1) / 5;
 
-contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, notWhitelisted]) {
+contract('OwnTokenCrowdsale deployment', function ([origWallet, investor, wallet, notWhitelisted]) {
 	it("Should deploy with less than 4.7 mil gas", async () => {
 		this.openingTime = (await latestTime()) + duration.weeks(1);
 		this.closingTime = this.openingTime + duration.weeks(20);

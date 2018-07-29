@@ -14,18 +14,6 @@ module.exports = function(deployer, network, accounts) {
 
 	// 1000000000000000000 = 1 Eth
 
-	/*
-			address _wallet,
-		OwnToken _token,
-		uint256 _hardCap,
-		uint256 _softCap,
-		uint256 _openingTime,
-		uint256 _closingTime,
-		uint256 _minInvestment,
-		uint256 _p1End, uint256 _p1Rate,
-		uint256 _p2End, uint256 _p2Rate
-	*/
-
     return deployer		
 		// Deploy crowdsale
         .then(() => {
