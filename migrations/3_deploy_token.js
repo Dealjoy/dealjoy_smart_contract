@@ -1,5 +1,5 @@
-// enable when deploying
-/*
+
+
 const OwnToken = artifacts.require('./OwnToken.sol');
 
 module.exports = function(deployer, network, accounts) {
@@ -11,7 +11,9 @@ module.exports = function(deployer, network, accounts) {
 	
 	const decimals = 18;
 
+// enable when deploying
     return deployer		
+/*
         .then(() => {
             return deployer.deploy(
                 OwnToken,
@@ -20,9 +22,8 @@ module.exports = function(deployer, network, accounts) {
 				decimals,
 				ticker
             );
-        })
+        })*/
 		;
 	
 };
 
-*/

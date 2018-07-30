@@ -7,7 +7,7 @@ module.exports = function(deployer, network, accounts) {
 	const hardCap = new web3.BigNumber(10000000000000000000); // 10 Eth
 	
 	// https://www.unixtimestamp.com/index.php
-    const openingTime = new web3.BigNumber(1532908800); // 07/30/2018 @ 12:00am (UTC)
+    const openingTime = new web3.BigNumber(1532937600); // 07/30/2018 @ 8:00am (UTC)
 	const closingTime = openingTime + 86400 * 28; // 28 days;	
 	
 	const minInvestment = new web3.BigNumber(200000000000000000); // 0.2 Eth

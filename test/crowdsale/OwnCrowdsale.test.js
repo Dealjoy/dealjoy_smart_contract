@@ -3,6 +3,7 @@ const { advanceBlock } = require('../helpers/advanceToBlock');
 const { increaseTimeTo, duration } = require('../helpers/increaseTime');
 const { latestTime } = require('../helpers/latestTime');
 const { EVMRevert } = require('../helpers/EVMRevert');
+const { ethGetBalance } = require('../helpers/web3');
 
 const BigNumber = web3.BigNumber;
 
@@ -98,7 +99,6 @@ contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, notWhitel
 		
 	  await this.crowdsale.addAddressesToWhitelist([ notWhitelisted ]);
 	  
-	  // The crowdsale hasn't started
 	  await this.crowdsale.sendTransaction({ value: minInvestment, from: notWhitelisted }).should.be.fulfilled;
     });
 
@@ -135,5 +135,22 @@ contract('OwnTokenCrowdsale', function ([origWallet, investor, wallet, notWhitel
     });
 
   });
-  
+
+  describe('with custom investment', function () {
+	it('should accept investment', async function () {	  
+	  await this.crowdsale.sendEther({ value: minInvestment }).should.be.fulfilled;
+    });
+	it('should be forwarded correctly', async function () {
+	  const pre = await ethGetBalance(wallet);
+
+	  await this.crowdsale.sendEther({ value: minInvestment }).should.be.fulfilled;
+
+	  const post = await ethGetBalance(wallet);
+	
+	  post.minus(pre).should.be.bignumber.equal(minInvestment);
+    });
+
+
+  });
+
 });
