@@ -44,7 +44,7 @@ contract OwnCrowdsale is WhitelistedCrowdsale, TimedCrowdsale, CappedCrowdsale, 
 	require(_weiAmount >= minInvestment, "Sorry, minimum investment not met");
   }
 
-	function sendEther() payable {
+	function sendEther() payable public {
 		invest(msg.sender);
 	}
 }
