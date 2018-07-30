@@ -90,7 +90,6 @@ The smart contracts are layered with inheritance to add functionality in a struc
 	* CappedCrowdsale
 * Ownable
 	* Pausable
-* Time
 * WhitelistedCrowdsale, TimedCrowdsale, CappedCrowdsale, Pausable
 	* OwnCrowdsale
 
