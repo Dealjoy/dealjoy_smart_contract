@@ -58,8 +58,7 @@ The following functionality is implemented with these contracts (also noted with
 
 ### Functionality for tokens
 
-The token is an ERC20 compliant ( https://theethereum.wiki/w/index.php/ERC20_Token_Standard ) token with the default details added (name, ticker, decimals).
-The token contains no functionality and only represents an asset.
+The token is an ERC20 compliant ( https://theethereum.wiki/w/index.php/ERC20_Token_Standard ) token with the default details added (name, ticker, decimals). No other extra functionality is implemented.
 
 ## Implementation notes
 This crowdsale does not handle tokens. This crowdsale is only used to gather Ether investments from whitelisted investors.

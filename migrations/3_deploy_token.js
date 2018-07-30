@@ -13,7 +13,7 @@ module.exports = function(deployer, network, accounts) {
 
 // enable when deploying
     return deployer		
-/*
+
         .then(() => {
             return deployer.deploy(
                 OwnToken,
@@ -22,7 +22,7 @@ module.exports = function(deployer, network, accounts) {
 				decimals,
 				ticker
             );
-        })*/
+        })
 		;
 	
 };
